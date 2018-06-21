@@ -2,14 +2,14 @@ begin
        set i = 1
        set max_elem = a
        display "initial max_elem:" max_elem
-       while i < num_elements do
-           if a[i] > max_elem
+       repeat 
+           if a > max_elem
            then
                set max_elem = a
-               set hh = varm2 ^ 3
+               set h = varm2 * 3
                display "max_elem:" max_elem
            endif
            set i = i + 1
-       endwhile
+       until
        return max_elem
-  endfun max_array
+endfun max_array

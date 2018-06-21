@@ -1,6 +1,8 @@
 
+import java.awt.Component;
 import java.awt.List;
 import java.io.*; // needed for buffered reader 
+import java.util.ArrayList;
 import java.util.LinkedList;
 public class scanner
 {
@@ -13,6 +15,8 @@ public class scanner
   	
   	//operators 
   	static String[] operators = {"=", "<=", "<", ">=", ">", "==", "~=", "+", "-", "*", "/"};
+  	
+  	static List tokenized = new List();
   	
   	public static boolean isInteger(String s) // this will see if the lexeme is an int 
   	{ 
@@ -37,8 +41,10 @@ public class scanner
   		for(int i = 0; i < keywords.length; i++)//checking for match in keywords
   		{
   			if(string.equals(keywords[i])){
+  				int token = (i + 1);
   				System.out.print("Line: " + lineRead + " ");
-  				System.out.print("Token found: " + (i + 1) + " "); // token value is based on position in table 
+  				System.out.print("Token found: " + token + " "); // token value is based on position in table 
+  				tokenized.add(lineRead + " " + token + " " + string);
   				return true;
   			}
   		}
@@ -51,8 +57,10 @@ public class scanner
   		for(int i = 0; i < operators.length; i++)//checking for match in keywords
   		{
   			if(string.equals(operators[i])){
+  				int token = ((i) + (keywords.length + 1));
   				System.out.print("Line: " + lineRead + " ");
-  				System.out.print("Token found: " + ((i) + (keywords.length + 1)) + " "); //token value is based on position in table plus length of key words 
+  				System.out.print("Token found: " + token + " "); //token value is based on position in table plus length of key words
+  				tokenized.add(lineRead + " " + token + " " + string);
   				return true;
   			}
   		}
@@ -64,8 +72,10 @@ public class scanner
 		
   		
   			if(isInteger(string)) { 
+  				int token = (((operators.length) + (keywords.length + 1))+1);
   				System.out.print("Line: " + lineRead + " ");
-  				System.out.print("Token found: " + (((operators.length) + (keywords.length + 1))+1) + " "); //obtains assigned token value 
+  				System.out.print("Token found: " + token + " "); //obtains assigned token value
+  				tokenized.add(lineRead + " " + token + " " + string);
   				return true;
   			
   			
@@ -80,8 +90,10 @@ public class scanner
         {
             // checking valid float using parseInt() method
             Float.parseFloat(string);
+            int token = (((operators.length) + (keywords.length + 1))+2);
             System.out.print("Line: " + lineRead + " ");
-            System.out.print("Token found: " + (((operators.length) + (keywords.length + 1))+2) + " "); //obtains assigned token value 
+            System.out.print("Token found: " + token + " "); //obtains assigned token value 
+            tokenized.add(lineRead + " " + token + " " + string);
             return true;
         } 
         catch (NumberFormatException e)
@@ -94,18 +106,28 @@ public class scanner
   	
   	public static void printLiteral(String string)
   	{
+  		int token = (((operators.length) + (keywords.length + 1))+3);
   		System.out.print("Line: " + lineRead + " ");
-        System.out.print("Token found: " + (((operators.length) + (keywords.length + 1))+3) + " "); //obtains assigned token value 
+        System.out.print("Token found: " + token + " "); //obtains assigned token value
+        tokenized.add(lineRead + " " + token + " " + string);
+  	}
+  	public static void printOther(String string)
+  	{
+  		int token = (((operators.length) + (keywords.length + 1))+4);
+  		System.out.print("Line: " + lineRead + " ");
+        System.out.print("Token found: " + token + " "); //obtains assigned token value
+        tokenized.add(lineRead + " " + token + " " + string);
   	}
   	
   	public static void check(String[] splited)
   	{
   		for(int i = 0; i < splited.length; i++)//going through all substrings
   		{
-  			String st = splited[i].replace("\\s+", "");
+  			String st = splited[i];
   			
   			if(checkKeywords(st))//checks if lexeme is a keyword 
   			{
+  				
   				System.out.println("Lexeme found: " + st);
   			}
   			else if(checkOperators(st))//checks if lexeme is an operator 
@@ -120,9 +142,31 @@ public class scanner
   			{
   				System.out.println("Lexeme found: " + st);
   			}
+  			else if(st.startsWith("\""))
+  			{
+  				int x;
+  				    for(x = i; x < splited.length; x++)
+  				    {
+  				    	if(splited[x].endsWith("\"") && x == i )
+  				    		break;
+  				    	
+  				    	if(splited[x].endsWith("\""))      //loop used to construct literal 
+  				    	{
+  				    		st = st + " " + splited[x];
+  				    		break;
+  				    	}
+  				    	if(i == x)
+  				    		st = splited[x] + " ";
+  				    	else 
+  				    		st = st + " " + splited[x] + " ";
+  				    }
+  				i = x; //doesnt analyze same part of scentence again 
+  				printLiteral(st); //print literal 
+  				System.out.println("Lexeme found: " + st);
+  			}
   			else
   			{
-  				printLiteral(st);
+  				printOther(st);
   				System.out.println("Lexeme found: " + st);
   			}
   		}
@@ -130,14 +174,16 @@ public class scanner
 
 	public static void main(String[] args)throws Exception
 	{
+	  	
 		  File file = new File("C:\\Users\\Public\\eclipse-workspace\\Scanner\\ScannedFile"); //file reading from 
 		  FileReader fileReader = new FileReader(file);
 	      BufferedReader br = new BufferedReader(new FileReader(file));
 			String line;
 			while ((line = br.readLine()) != null) { //while some of file is remaing 
 				StringBuffer stringBuffer = new StringBuffer();
+				line = line.trim(); //remove extra white space 
 				stringBuffer.append(line); //seperates by white space 
-				stringBuffer.append(" ");
+				stringBuffer.append(" "); //space used as delimeter 
 				
 				String str = stringBuffer.toString();
 	 		    String[] splited = str.split(" "); //splits string into several for analysis
@@ -145,5 +191,19 @@ public class scanner
 			    lineRead++; //used to display the line from file read from 
 			}
 			fileReader.close();
+			
+			String[][] tokens = {};
+			String[][] lexemes = {};
+			
+			//prints global variable holding tokens 
+			for(int i = 0; i < tokenized.getItemCount(); i++) {
+	            System.out.println(tokenized.getItem(i));
+	            String str = tokenized.getItem(i);
+	        }
+			//"line" "token" "lexeme"
+			//everything is in one variable becuase it is easier to pass as an argument
+			//with it being seperated by whitespace, this will make it possible to parse and place in seperate variables once it has reached its desitination 
+			
+			
 	 }
 }
