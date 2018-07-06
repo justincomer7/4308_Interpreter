@@ -1,0 +1,37 @@
+forward references 
+	function loop 
+			return type void
+	function check
+		return type void
+		
+global declarations
+define x
+define f
+
+implementations
+function main return type void 
+begin 
+	set x = 28
+	set f = 1
+	loop
+	check
+endfun
+function loop return type void
+begin
+	repeat 
+    set x = x / 2
+    set f = f + 1
+    until 
+	x == 7
+	endrepeat
+	set f = f + 1
+endfun
+function check return type void
+begin
+	if x == 28 / f
+	then
+		display "Error"
+	else
+		display "correct"
+	endif
+endfun
