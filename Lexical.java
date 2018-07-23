@@ -172,7 +172,7 @@ public class Lexical
 	
 	public static List getList() throws IOException {
 		
-		 File file = new File("C:\\Users\\Public\\eclipse-workspace\\Scanner\\ScannedFile"); //file reading from 
+		 File file = new File("C:\\Users\\justin\\eclipse-workspace\\Interpreter\\src\\ScannedFile"); //file reading from 
 		  FileReader fileReader = new FileReader(file);
 	      BufferedReader br = new BufferedReader(new FileReader(file));
 			String line;
